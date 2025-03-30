@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = nv("DATABASE_URL")
+}
+
+model Book {
+  id        Int         @id @default(autoincrement())
+  isbn      String      @unique
+  title     String
+  category  String
+  author    Author      @relation(fields: [authorId], references: [id])
+  authorId  Int
+  borrowing    Borrowing[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+}
+
+model Author {
+  id        Int      @id @default(autoincrement())
+  firstName String
+  lastName  String
+  affiliation String
+  books     Book[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Member {
+  id          Int         @id @default(autoincrement())
+  memberId    String      @unique
+  firstName   String
+  lastName    String
+  phoneNumber String
+  borrowing      Borrowing[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Borrowing {
+  id         Int       @id @default(autoincrement())
+  member     Member    @relation(fields: [memberId], references: [id])
+  memberId   Int
+  book       Book      @relation(fields: [bookId], references: [id])
+  bookId     Int
+  dueDate    DateTime
+  returnDate DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
